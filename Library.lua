@@ -9,6 +9,8 @@ local RenderStepped = RunService.RenderStepped;
 local LocalPlayer = Players.LocalPlayer;
 local Mouse = LocalPlayer:GetMouse();
 
+local Typing = false
+
 local ProtectGui = protectgui or (syn and syn.protect_gui) or (function() end);
 
 local ScreenGui = Instance.new('ScreenGui');
@@ -65,6 +67,12 @@ table.insert(Library.Signals, RenderStepped:Connect(function(Delta)
 		Library.CurrentRainbowColor = Color3.fromHSV(Hue, 0.8, 1);
 	end
 end))
+
+
+InputService.InputBegan:Connect(function (_,x)
+	if x then Typing = true; print("plr is typing") else Typing = false end
+end)
+
 
 local function GetPlayersString()
 	local PlayerList = Players:GetPlayers();
@@ -1228,7 +1236,7 @@ do
 		local Picking = false;
 
 		PickOuter.InputBegan:Connect(function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() then
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() and not Typing then
 				Picking = true;
 
 				DisplayLabel.Text = '';
@@ -1282,7 +1290,7 @@ do
 		end);
 
 		Library:GiveSignal(InputService.InputBegan:Connect(function(Input)
-			if (not Picking) then
+			if (not Picking) and not Typing then
 				if KeyPicker.Mode == 'Toggle' then
 					local Key = KeyPicker.Value;
 
@@ -3061,7 +3069,7 @@ function Library:CreateWindow(...)
 	function Window:ChangeName(Text)
 		WindowLabel.Text = Text
 	end
-	
+
 	function Window:AddTab(Name)
 		local Tab = {
 			Groupboxes = {};
